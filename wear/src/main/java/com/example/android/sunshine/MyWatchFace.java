@@ -31,6 +31,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 import android.widget.Toast;
@@ -48,9 +49,10 @@ import java.util.concurrent.TimeUnit;
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
  */
 public class MyWatchFace extends CanvasWatchFaceService {
+
+
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
-
     /**
      * Update rate in milliseconds for interactive mode. We update once a second since seconds are
      * displayed in interactive mode.
@@ -87,7 +89,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
         }
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine {
+     private class Engine extends CanvasWatchFaceService.Engine {
         final Handler mUpdateTimeHandler = new EngineHandler(this);
         boolean mRegisteredTimeZoneReceiver = false;
         Paint mBackgroundPaint;
@@ -103,6 +105,14 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 invalidate();
             }
         };
+
+         private final BroadcastReceiver mWeatherReceiver = new BroadcastReceiver() {
+             @Override
+             public void onReceive(Context context, Intent intent) {
+                 weatherDataReceived(intent);
+             }
+
+         };
         float mXOffset;
         float mYOffset;
         float dateYOffset;
@@ -138,6 +148,13 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
 
             mCalendar = Calendar.getInstance();
+        }
+
+        private void weatherDataReceived(Intent intent){
+            String maxTemp = intent.getStringExtra("max-temp");
+            String minTemp = intent.getStringExtra("min-temp");
+            int weatherId  = intent.getIntExtra("weatherId",0);
+            Log.d("besho","in weatherDataReceived:"+maxTemp+","+minTemp+","+weatherId);
         }
 
         @Override
@@ -180,6 +197,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
             mRegisteredTimeZoneReceiver = true;
             IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
             MyWatchFace.this.registerReceiver(mTimeZoneReceiver, filter);
+            IntentFilter weatherFilter = new IntentFilter("ACTION_WEATHER_CHANGED");
+            MyWatchFace.this.registerReceiver(mWeatherReceiver, weatherFilter);
         }
 
         private void unregisterReceiver() {
@@ -188,6 +207,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             }
             mRegisteredTimeZoneReceiver = false;
             MyWatchFace.this.unregisterReceiver(mTimeZoneReceiver);
+            MyWatchFace.this.unregisterReceiver(mWeatherReceiver);
         }
 
         @Override
@@ -325,5 +345,6 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
         }
+
     }
 }

@@ -76,12 +76,13 @@ public class SunshineSyncTask {
                         WeatherContract.WeatherEntry.CONTENT_URI,
                         weatherValues);
 
+                SunshineSyncWithWear syncWithWear = new SunshineSyncWithWear(context);
+                syncWithWear.initializeGoogleApiClient();
                 /*
                  * Finally, after we insert data into the ContentProvider, determine whether or not
                  * we should notify the user that the weather has been refreshed.
                  */
                 boolean notificationsEnabled = SunshinePreferences.areNotificationsEnabled(context);
-
                 /*
                  * If the last notification was shown was more than 1 day ago, we want to send
                  * another notification to the user that the weather has been updated. Remember,

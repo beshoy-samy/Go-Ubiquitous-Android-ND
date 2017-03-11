@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.wear;
+package com.example.android.sunshine;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -34,6 +34,8 @@ import android.support.wearable.watchface.WatchFaceStyle;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 import android.widget.Toast;
+
+import com.example.android.R;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
@@ -288,6 +290,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             canvas.drawText(time, mXOffset, mYOffset, timeTextPaint);
             canvas.drawText(date, dateXOffset, dateYOffset, dateTextPaint);
             canvas.drawLine(dividerStartXOffset,dividerYOffset,dividerEndXOffset,dividerYOffset,divider);
+            
 
         }
 

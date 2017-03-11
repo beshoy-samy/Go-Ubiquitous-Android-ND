@@ -290,7 +290,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             canvas.drawText(time, mXOffset, mYOffset, timeTextPaint);
             canvas.drawText(date, dateXOffset, dateYOffset, dateTextPaint);
             canvas.drawLine(dividerStartXOffset,dividerYOffset,dividerEndXOffset,dividerYOffset,divider);
-            
+
 
         }
 

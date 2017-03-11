@@ -3,8 +3,6 @@ package com.example.android.sunshine.sync;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,13 +13,11 @@ import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
-import java.io.ByteArrayOutputStream;
 
 /**
  * Created by bisho on 11-Mar-17.
@@ -88,11 +84,7 @@ public class SunshineSyncWithWear implements GoogleApiClient.ConnectionCallbacks
         PutDataMapRequest mapRequest = PutDataMapRequest.create("/today-weather");
         mapRequest.getDataMap().putString("max-temp",highString);
         mapRequest.getDataMap().putString("min-temp",lowString);
-
-        int weatherImage = SunshineWeatherUtils.getSmallArtResourceIdForWeatherCondition(weatherId);
-        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), weatherImage);
-        Asset asset = createAssetFromBitmap(bitmap);
-        mapRequest.getDataMap().putAsset("weather-image",asset);
+        mapRequest.getDataMap().putInt("weather-image",weatherId);
 
         PutDataRequest dataRequest = mapRequest.asPutDataRequest();
         Wearable.DataApi.putDataItem(mGoogleApiClient,dataRequest)
@@ -104,12 +96,6 @@ public class SunshineSyncWithWear implements GoogleApiClient.ConnectionCallbacks
             }
         });
 
-    }
-
-    private Asset createAssetFromBitmap(Bitmap bitmap) {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
-        return Asset.createFromBytes(byteStream.toByteArray());
     }
 
     @Override

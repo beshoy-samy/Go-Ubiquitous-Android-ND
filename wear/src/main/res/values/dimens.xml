@@ -2,7 +2,7 @@
 <resources>
     <dimen name="digital_text_size">45dp</dimen>
     <dimen name="digital_text_size_round">45dp</dimen>
-    <dimen name="digital_x_offset">40dp</dimen>
+    <dimen name="digital_x_offset">45dp</dimen>
     <dimen name="digital_x_offset_round">60dp</dimen>
     <dimen name="digital_y_offset">65dp</dimen>
     <dimen name="digital_y_offset_round">80dp</dimen>
@@ -20,4 +20,12 @@
     <dimen name="divider_x_startOffset_round">85dp</dimen>
     <dimen name="divider_x_endOffset">120dp</dimen>
     <dimen name="divider_x_endOffset_round">130dp</dimen>
+
+    <dimen name="weather_row_y_offset">120dp</dimen>
+    <dimen name="weather_row_y_offset_round">135dp</dimen>
+
+    <dimen name="weather_image_x_offset">@dimen/date_x_offset</dimen>
+    <dimen name="max_temp_x_offset">80dp</dimen>
+    <dimen name="min_temp_x_offset">120dp</dimen>
+
 </resources>

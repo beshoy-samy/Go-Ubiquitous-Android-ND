@@ -15,6 +15,7 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 public class GetWeatherDataService extends WearableListenerService {
 
+
     @Override
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
         for (DataEvent dataEvent : dataEventBuffer){

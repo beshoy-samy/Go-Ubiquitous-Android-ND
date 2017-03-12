@@ -21,6 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -96,6 +98,9 @@ public class MyWatchFace extends CanvasWatchFaceService {
         Paint timeTextPaint;
         Paint dateTextPaint;
         Paint divider;
+        Paint weatherImage;
+        Paint maxTemp;
+        Paint minTemp;
         boolean mAmbient;
         Calendar mCalendar;
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
@@ -105,14 +110,13 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 invalidate();
             }
         };
-
-         private final BroadcastReceiver mWeatherReceiver = new BroadcastReceiver() {
+        private final BroadcastReceiver mWeatherReceiver = new BroadcastReceiver() {
              @Override
              public void onReceive(Context context, Intent intent) {
                  weatherDataReceived(intent);
              }
 
-         };
+        };
         float mXOffset;
         float mYOffset;
         float dateYOffset;
@@ -120,8 +124,15 @@ public class MyWatchFace extends CanvasWatchFaceService {
         float dividerYOffset;
         float dividerStartXOffset;
         float dividerEndXOffset;
+        float weatherRowYOffset;
+        float imageXOffset;
+        float maxTempXOffset;
+        float minTempXOffset;
+        String highTemp="";
+        String lowTemp="";
+        int imageId=0;
 
-        /**
+         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
          */
@@ -145,16 +156,23 @@ public class MyWatchFace extends CanvasWatchFaceService {
             timeTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
             dateTextPaint = createTextPaint(resources.getColor(R.color.secondary_text));
             divider = createTextPaint(resources.getColor(R.color.divider));
+            maxTemp = createTextPaint(resources.getColor(R.color.digital_text));
+            minTemp = createTextPaint(resources.getColor(R.color.secondary_text));
+            weatherImage = createImagePaint();
 
+            imageXOffset = resources.getDimension(R.dimen.weather_image_x_offset);
+            maxTempXOffset = resources.getDimension(R.dimen.max_temp_x_offset);
+            minTempXOffset = resources.getDimension(R.dimen.min_temp_x_offset);
 
             mCalendar = Calendar.getInstance();
         }
 
         private void weatherDataReceived(Intent intent){
-            String maxTemp = intent.getStringExtra("max-temp");
-            String minTemp = intent.getStringExtra("min-temp");
-            int weatherId  = intent.getIntExtra("weatherId",0);
-            Log.d("besho","in weatherDataReceived:"+maxTemp+","+minTemp+","+weatherId);
+            highTemp = intent.getStringExtra("max-temp");
+            lowTemp = intent.getStringExtra("min-temp");
+            imageId  = intent.getIntExtra("weatherId",0);
+            invalidate();
+            Log.d("besho","in weatherDataReceived:"+highTemp+","+lowTemp+","+imageId);
         }
 
         @Override
@@ -170,6 +188,13 @@ public class MyWatchFace extends CanvasWatchFaceService {
             paint.setAntiAlias(true);
             return paint;
         }
+
+         private Paint createImagePaint() {
+             Paint paint = new Paint();
+             paint.setTypeface(NORMAL_TYPEFACE);
+             paint.setAntiAlias(true);
+             return paint;
+         }
 
         @Override
         public void onVisibilityChanged(boolean visible) {
@@ -231,6 +256,9 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     ? R.dimen.divider_x_startOffset_round : R.dimen.divider_x_startOffset);
             dividerEndXOffset = resources.getDimension(isRound
                     ? R.dimen.divider_x_endOffset_round : R.dimen.divider_x_endOffset);
+            weatherRowYOffset = resources.getDimension(isRound
+                    ? R.dimen.weather_row_y_offset_round : R.dimen.weather_row_y_offset);
+
             float textSize = resources.getDimension(isRound
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
             float dateTextSize = resources.getDimension(isRound
@@ -238,6 +266,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
             timeTextPaint.setTextSize(textSize);
             dateTextPaint.setTextSize(dateTextSize);
+            maxTemp.setTextSize(dateTextSize+5);
+            minTemp.setTextSize(dateTextSize+5);
         }
 
         @Override
@@ -311,6 +341,13 @@ public class MyWatchFace extends CanvasWatchFaceService {
             canvas.drawText(date, dateXOffset, dateYOffset, dateTextPaint);
             canvas.drawLine(dividerStartXOffset,dividerYOffset,dividerEndXOffset,dividerYOffset,divider);
 
+            if(!highTemp.isEmpty()){
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+                        SunshineWeatherUtils.getSmallArtResourceIdForWeatherCondition(imageId));
+                canvas.drawBitmap(bitmap,imageXOffset,weatherRowYOffset,weatherImage);
+                canvas.drawText(highTemp,maxTempXOffset,weatherRowYOffset+35,maxTemp);
+                canvas.drawText(lowTemp,minTempXOffset,weatherRowYOffset+35,minTemp);
+            }
 
         }
 
